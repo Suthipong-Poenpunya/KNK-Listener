@@ -233,14 +233,15 @@
     function showDetails(complaint) {
       document.getElementById('modalProblemName').textContent = complaint.problemName;
       document.getElementById('modalOrder').textContent = complaint.order;
-      document.getElementById('modalSubmissionDate').textContent = formatDate(complaint.submissionDate);
+      document.getElementById('modalSubmissionDate').textContent = formatDate(complaint.submissionDate); // แก้ไข: ใช้ formatDate เพื่อจัดรูปแบบวันที่
       document.getElementById('modalStatus').textContent = complaint.status;
       document.getElementById('modalDetails').textContent = complaint.details;
       document.getElementById('modalSuggestions').textContent = complaint.suggestions;
 
-      // เพิ่มโค้ดเพื่อแสดงรูปภาพ
-      const modalImage_pathContainer = document.getElementById('modalImage_pathContainer');
-      const modalImage_path = document.getElementById('modalImage_path');
+      // แก้ไขตรงนี้: ใช้ตัวแปรที่ถูกต้องตรงกับ ID ใน HTML
+      const modalImageContainer = document.getElementById('modalImage_pathContainer');
+      const modalImage = document.getElementById('modalImage_path');
+
       if (complaint.image) {
         modalImage.src = complaint.image;
         modalImageContainer.classList.remove('hidden');
