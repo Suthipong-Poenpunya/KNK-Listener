@@ -131,7 +131,7 @@
 <div id="detailModal" class="modal">
   <div class="modal-content">
     <span class="close-button" onclick="closeModal()">&times;</span>
-    <h2 id="modalProblemName" class="text-2xl font-bold text-indigo-700 mb-4"></h2>
+    <h2 id="modalProblemName" class="text-2xl font-bold text-pink-700 mb-4"></h2>
     <div class="space-y-3 text-gray-700">
       <p><strong class="font-semibold">ลำดับ:</strong> <span id="modalOrder"></span></p>
       <p><strong class="font-semibold">วันที่ส่งฟอร์ม:</strong> <span id="modalSubmissionDate"></span></p>
@@ -142,7 +142,7 @@
       <p id="modalSuggestions" class="bg-gray-50 p-3 rounded-lg border border-gray-200"></p>
       <div id="modalImageContainer" class="mt-4 hidden">
         <strong class="font-semibold">รูปภาพ:</strong>
-        <img id="modalImage" src="" alt="รูปภาพประกอบ" class="mt-2 rounded-lg max-w-full h-auto border border-gray-300">
+        <img id="modalImage-path" src="" alt="รูปภาพประกอบ" class="mt-2 rounded-lg max-w-full h-auto border border-gray-300">
       </div>
     </div>
   </div>
@@ -240,7 +240,7 @@
 
       // เพิ่มโค้ดเพื่อแสดงรูปภาพ
       const modalImageContainer = document.getElementById('modalImageContainer');
-      const modalImage = document.getElementById('modalImage');
+      const modalImage = document.getElementById('modalImage-path');
       if (complaint.image) {
         modalImage.src = complaint.image;
         modalImageContainer.classList.remove('hidden');
