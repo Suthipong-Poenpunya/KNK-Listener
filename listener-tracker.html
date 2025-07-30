@@ -86,13 +86,11 @@
 </style>
 </head>
 
-<!-- Main Container -->
 <div class="bg-white p-6 sm:p-8 md:p-10 rounded-2xl shadow-xl w-full max-w-5xl mb-8">
   <h1 class="text-3xl sm:text-4xl font-extrabold text-center text-orange-600 mb-6 sm:mb-8">
     ระบบติดตามสถานะร้องเรียนของนิสิต
   </h1>
 
-  <!-- Search and Filter Section -->
   <div class="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
     <input type="text" id="searchInput" placeholder="ค้นหาชื่อปัญหา หรือสถานะ..."
            class="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base">
@@ -106,7 +104,6 @@
     </select>
   </div>
 
-  <!-- Complaints Table -->
   <div class="overflow-x-auto rounded-xl border border-pink-200 shadow-sm">
     <table class="min-w-full divide-y divide-pink-200">
       <thead class="bg-pink-600 text-white">
@@ -126,13 +123,11 @@
       </tr>
       </thead>
       <tbody id="complaintTableBody" class="bg-white divide-y divide-gray-100">
-      <!-- Data will be populated here by JavaScript -->
       </tbody>
     </table>
   </div>
 </div>
 
-<!-- Detail Modal -->
 <div id="detailModal" class="modal">
   <div class="modal-content">
     <span class="close-button" onclick="closeModal()">&times;</span>
@@ -145,18 +140,31 @@
       <p id="modalDetails" class="bg-gray-50 p-3 rounded-lg border border-gray-200"></p>
       <p><strong class="font-semibold">ข้อเสนอแนะ:</strong></p>
       <p id="modalSuggestions" class="bg-gray-50 p-3 rounded-lg border border-gray-200"></p>
+      <div id="modalImageContainer" class="mt-4 hidden">
+        <strong class="font-semibold">รูปภาพ:</strong>
+        <img id="modalImage" src="" alt="รูปภาพประกอบ" class="mt-2 rounded-lg max-w-full h-auto border border-gray-300">
+      </div>
     </div>
   </div>
 </div>
 
   <script>
-    // Simulated data from Google Sheet
-    // In a real application, this data would be fetched from a Google Apps Script
-    // acting as a web service for your Google Sheet.
+    let complaintsData = []; // Store the fetched data globally
+
+    // Function to format date to a more readable format (e.g., 30/7/2568)
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const day = date.getDate();
+      const month = date.getMonth() + 1; // getMonth() is 0-indexed
+      const year = date.getFullYear() + 543; // Convert to Buddhist calendar year
+      return `${day}/${month}/${year}`;
+    }
+
+    // Function to fetch data and render the table
     fetch('https://script.google.com/macros/s/AKfycbwji2vOl6fGeCTIjmexBoU8BwRSYtm7Lj7YhBapXQgsGV0Ai_jxbqoB0I-IZN_KsypHyw/exec')
             .then(response => response.json())
             .then(data => {
-              const complaintsData = data;
+              complaintsData = data; // Assign fetched data to the global variable
               renderTable(complaintsData);
             })
             .catch(error => console.error('Error fetching data:', error));
@@ -186,7 +194,7 @@
         row.innerHTML = `
                       <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm font-medium text-gray-900">${complaint.order}</td>
                       <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm text-gray-800">${complaint.problemName}</td>
-                      <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm text-gray-600">${complaint.submissionDate}</td>
+                      <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm text-gray-600">${formatDate(complaint.submissionDate)}</td>
                       <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm">
                           <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
                               ${complaint.status === 'แก้ไขแล้ว' ? 'bg-green-100 text-green-800' : ''}
@@ -225,10 +233,20 @@
     function showDetails(complaint) {
       document.getElementById('modalProblemName').textContent = complaint.problemName;
       document.getElementById('modalOrder').textContent = complaint.order;
-      document.getElementById('modalSubmissionDate').textContent = complaint.submissionDate;
+      document.getElementById('modalSubmissionDate').textContent = formatDate(complaint.submissionDate);
       document.getElementById('modalStatus').textContent = complaint.status;
       document.getElementById('modalDetails').textContent = complaint.details;
       document.getElementById('modalSuggestions').textContent = complaint.suggestions;
+
+      // เพิ่มโค้ดเพื่อแสดงรูปภาพ
+      const modalImageContainer = document.getElementById('modalImageContainer');
+      const modalImage = document.getElementById('modalImage');
+      if (complaint.image) {
+        modalImage.src = complaint.image;
+        modalImageContainer.classList.remove('hidden');
+      } else {
+        modalImageContainer.classList.add('hidden');
+      }
 
       // Apply status-specific styling to the modal status text
       const modalStatusElement = document.getElementById('modalStatus');
@@ -266,7 +284,8 @@
 
     // Initial render of the table when the page loads
     document.addEventListener('DOMContentLoaded', () => {
-      renderTable(complaintsData);
+      // Data is now fetched in the `fetch` block, so this initial render is not needed.
+      // The `fetch` block handles it.
     });
   </script>
 </body>
