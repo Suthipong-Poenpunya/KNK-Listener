@@ -140,9 +140,9 @@
       <p id="modalDetails" class="bg-gray-50 p-3 rounded-lg border border-gray-200"></p>
       <p><strong class="font-semibold">ข้อเสนอแนะ:</strong></p>
       <p id="modalSuggestions" class="bg-gray-50 p-3 rounded-lg border border-gray-200"></p>
-      <div id="modalImageContainer" class="mt-4 hidden">
+      <div id="modalImage_pathContainer" class="mt-4 hidden">
         <strong class="font-semibold">รูปภาพ:</strong>
-        <img id="modalImage-path" src="" alt="รูปภาพประกอบ" class="mt-2 rounded-lg max-w-full h-auto border border-gray-300">
+        <img id="modalImage_path" src="" alt="รูปภาพประกอบ" class="mt-2 rounded-lg max-w-full h-auto border border-gray-300">
       </div>
     </div>
   </div>
@@ -156,7 +156,7 @@
       const date = new Date(dateString);
       const day = date.getDate();
       const month = date.getMonth() + 1; // getMonth() is 0-indexed
-      const year = date.getFullYear() + 543; // Convert to Buddhist calendar year
+      const year = date.getFullYear(); // Convert to Buddhist calendar year
       return `${day}/${month}/${year}`;
     }
 
@@ -239,8 +239,8 @@
       document.getElementById('modalSuggestions').textContent = complaint.suggestions;
 
       // เพิ่มโค้ดเพื่อแสดงรูปภาพ
-      const modalImageContainer = document.getElementById('modalImageContainer');
-      const modalImage = document.getElementById('modalImage-path');
+      const modalImage_pathContainer = document.getElementById('modalImage_pathContainer');
+      const modalImage_path = document.getElementById('modalImage_path');
       if (complaint.image) {
         modalImage.src = complaint.image;
         modalImageContainer.classList.remove('hidden');
