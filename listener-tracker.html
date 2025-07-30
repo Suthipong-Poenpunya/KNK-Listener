@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KNK-Listener</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="/img/Logo_EDU-01.png" type="image/x-icon">
+</head>
+<body class="p-4 sm:p-6 md:p-8 lg:p-10 min-h-screen flex flex-col items-center">
+<header class="text-center mb-12">
+  <img src="img/Logo_EDU-01.png" alt="EDU-Listener Logo" class="w-[240px] mx-auto center-block">
+  <h1 class="text-5xl md:text-6xl font-bold text-dark mb-4">KNK-Listener</h1>
+</header>
+<style>
+  .link-home{
+    text-align: center;
+    text-decoration: none;
+    color: #000;
+    font-size: 1rem;
+    font-weight: 100;
+    text-decoration-color: #555555;
+  }
+  .modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-content {
+    background-color: #ffffff;
+    margin: auto;
+    padding: 2.5rem; /* Increased padding */
+    border-radius: 1.5rem; /* More rounded corners */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+    transform: translateY(-20px); /* Slight lift effect */
+    transition: transform 0.3s ease-out;
+  }
+  .modal-content.show {
+    transform: translateY(0);
+  }
+  .close-button {
+    color: #aaa;
+    position: absolute;
+    top: 1.5rem; /* Adjusted position */
+    right: 1.5rem; /* Adjusted position */
+    font-size: 2.25rem; /* Larger font size */
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s ease-in-out;
+  }
+  .close-button:hover,
+  .close-button:focus {
+    color: #000;
+    text-decoration: none;
+  }
+  /* Custom scrollbar for better aesthetics */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+</style>
+</head>
+
+<!-- Main Container -->
+<div class="bg-white p-6 sm:p-8 md:p-10 rounded-2xl shadow-xl w-full max-w-5xl mb-8">
+  <h1 class="text-3xl sm:text-4xl font-extrabold text-center text-orange-600 mb-6 sm:mb-8">
+    ระบบติดตามสถานะร้องเรียนของนิสิต
+  </h1>
+
+  <!-- Search and Filter Section -->
+  <div class="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <input type="text" id="searchInput" placeholder="ค้นหาชื่อปัญหา หรือสถานะ..."
+           class="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base">
+    <select id="statusFilter"
+            class="p-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base">
+      <option value="">ทั้งหมด</option>
+      <option value="รอการตรวจสอบ">รอการตรวจสอบ</option>
+      <option value="กำลังดำเนินการ">กำลังดำเนินการ</option>
+      <option value="แก้ไขแล้ว">แก้ไขแล้ว</option>
+      <option value="ปิดเรื่อง">ปิดเรื่อง</option>
+    </select>
+  </div>
+
+  <!-- Complaints Table -->
+  <div class="overflow-x-auto rounded-xl border border-pink-200 shadow-sm">
+    <table class="min-w-full divide-y divide-pink-200">
+      <thead class="bg-pink-600 text-white">
+      <tr>
+        <th scope="col" class="px-4 py-3 sm:px-6 text-left text-xs font-semibold uppercase tracking-wider rounded-tl-xl">
+          ลำดับ
+        </th>
+        <th scope="col" class="px-4 py-3 sm:px-6 text-left text-xs font-semibold uppercase tracking-wider">
+          ชื่อปัญหา
+        </th>
+        <th scope="col" class="px-4 py-3 sm:px-6 text-left text-xs font-semibold uppercase tracking-wider">
+          วันที่ส่งฟอร์ม
+        </th>
+        <th scope="col" class="px-4 py-3 sm:px-6 text-left text-xs font-semibold uppercase tracking-wider rounded-tr-xl">
+          สถานะ
+        </th>
+      </tr>
+      </thead>
+      <tbody id="complaintTableBody" class="bg-white divide-y divide-gray-100">
+      <!-- Data will be populated here by JavaScript -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div id="detailModal" class="modal">
+  <div class="modal-content">
+    <span class="close-button" onclick="closeModal()">&times;</span>
+    <h2 id="modalProblemName" class="text-2xl font-bold text-indigo-700 mb-4"></h2>
+    <div class="space-y-3 text-gray-700">
+      <p><strong class="font-semibold">ลำดับ:</strong> <span id="modalOrder"></span></p>
+      <p><strong class="font-semibold">วันที่ส่งฟอร์ม:</strong> <span id="modalSubmissionDate"></span></p>
+      <p><strong class="font-semibold">สถานะ:</strong> <span id="modalStatus" class="font-bold"></span></p>
+      <p><strong class="font-semibold">รายละเอียด:</strong></p>
+      <p id="modalDetails" class="bg-gray-50 p-3 rounded-lg border border-gray-200"></p>
+      <p><strong class="font-semibold">ข้อเสนอแนะ:</strong></p>
+      <p id="modalSuggestions" class="bg-gray-50 p-3 rounded-lg border border-gray-200"></p>
+    </div>
+  </div>
+</div>
+
+  <script>
+    // Simulated data from Google Sheet
+    // In a real application, this data would be fetched from a Google Apps Script
+    // acting as a web service for your Google Sheet.
+    fetch('https://script.google.com/macros/s/AKfycbwji2vOl6fGeCTIjmexBoU8BwRSYtm7Lj7YhBapXQgsGV0Ai_jxbqoB0I-IZN_KsypHyw/exec')
+            .then(response => response.json())
+            .then(data => {
+              const complaintsData = data;
+              renderTable(complaintsData);
+            })
+            .catch(error => console.error('Error fetching data:', error));
+
+    const complaintTableBody = document.getElementById('complaintTableBody');
+    const detailModal = document.getElementById('detailModal');
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+
+    // Function to render the table rows
+    function renderTable(data) {
+      complaintTableBody.innerHTML = ''; // Clear existing rows
+      if (data.length === 0) {
+        complaintTableBody.innerHTML = `
+                      <tr>
+                          <td colspan="4" class="px-4 py-4 text-center text-gray-500 text-base">
+                              ไม่พบข้อมูลการร้องเรียน
+                          </td>
+                      </tr>
+                  `;
+        return;
+      }
+
+      data.forEach(complaint => {
+        const row = document.createElement('tr');
+        row.classList.add('hover:bg-gray-50', 'cursor-pointer', 'transition-colors', 'duration-200');
+        row.innerHTML = `
+                      <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm font-medium text-gray-900">${complaint.order}</td>
+                      <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm text-gray-800">${complaint.problemName}</td>
+                      <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm text-gray-600">${complaint.submissionDate}</td>
+                      <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm">
+                          <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
+                              ${complaint.status === 'แก้ไขแล้ว' ? 'bg-green-100 text-green-800' : ''}
+                              ${complaint.status === 'กำลังดำเนินการ' ? 'bg-blue-100 text-blue-800' : ''}
+                              ${complaint.status === 'รอการตรวจสอบ' ? 'bg-yellow-100 text-yellow-800' : ''}
+                              ${complaint.status === 'ปิดเรื่อง' ? 'bg-gray-100 text-gray-800' : ''}
+                          ">
+                              ${complaint.status}
+                          </span>
+                      </td>
+                  `;
+        row.addEventListener('click', () => showDetails(complaint));
+        complaintTableBody.appendChild(row);
+      });
+    }
+
+    // Function to filter and search data
+    function filterAndSearch() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const selectedStatus = statusFilter.value;
+
+      const filteredData = complaintsData.filter(complaint => {
+        const matchesSearch = complaint.problemName.toLowerCase().includes(searchTerm) ||
+                complaint.status.toLowerCase().includes(searchTerm);
+        const matchesStatus = selectedStatus === "" || complaint.status === selectedStatus;
+        return matchesSearch && matchesStatus;
+      });
+      renderTable(filteredData);
+    }
+
+    // Event listeners for search and filter
+    searchInput.addEventListener('keyup', filterAndSearch);
+    statusFilter.addEventListener('change', filterAndSearch);
+
+    // Function to show complaint details in the modal
+    function showDetails(complaint) {
+      document.getElementById('modalProblemName').textContent = complaint.problemName;
+      document.getElementById('modalOrder').textContent = complaint.order;
+      document.getElementById('modalSubmissionDate').textContent = complaint.submissionDate;
+      document.getElementById('modalStatus').textContent = complaint.status;
+      document.getElementById('modalDetails').textContent = complaint.details;
+      document.getElementById('modalSuggestions').textContent = complaint.suggestions;
+
+      // Apply status-specific styling to the modal status text
+      const modalStatusElement = document.getElementById('modalStatus');
+      modalStatusElement.className = 'font-bold'; // Reset classes
+      if (complaint.status === 'แก้ไขแล้ว') {
+        modalStatusElement.classList.add('text-green-700');
+      } else if (complaint.status === 'กำลังดำเนินการ') {
+        modalStatusElement.classList.add('text-blue-700');
+      } else if (complaint.status === 'รอการตรวจสอบ') {
+        modalStatusElement.classList.add('text-yellow-700');
+      } else if (complaint.status === 'ปิดเรื่อง') {
+        modalStatusElement.classList.add('text-gray-700');
+      }
+
+      detailModal.style.display = 'flex'; // Show the modal
+      setTimeout(() => { // Add a slight delay for the transform animation
+        detailModal.querySelector('.modal-content').classList.add('show');
+      }, 10);
+    }
+
+    // Function to close the modal
+    function closeModal() {
+      detailModal.querySelector('.modal-content').classList.remove('show');
+      setTimeout(() => { // Hide after animation
+        detailModal.style.display = 'none';
+      }, 300); // Match CSS transition duration
+    }
+
+    // Close modal when clicking outside of it
+    window.addEventListener('click', (event) => {
+      if (event.target === detailModal) {
+        closeModal();
+      }
+    });
+
+    // Initial render of the table when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      renderTable(complaintsData);
+    });
+  </script>
+</body>
+<footer>
+  <a href="index.html" class="link-home">กลับหน้าหลัก</a>
+  <p>&copy; 2025 KNK-Listener. คณะกรรมการนิสิตปรัญญาบัณฑิตคณะครุศาสตร์ จุฬาลงกรณ์มหาวิทยาลัย สงวนลิขสิทธิ์</p>
+</footer>
+</html>

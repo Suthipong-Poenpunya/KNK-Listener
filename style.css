@@ -1,0 +1,79 @@
+@font-face {
+    font-family: 'ChulalongkornBold';
+    src: url('/fonts/CHULALONGKORNBold.woff2') format('woff2'),
+    url('/fonts/CHULALONGKORNBold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'ChulalongkornReg';
+    src: url('/fonts/CHULALONGKORNReg.woff2') format('woff2'),
+    url('/fonts/CHULALONGKORNReg.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'ChulaCharasNewReg';
+    src: url('/fonts/ChulaCharasNewReg.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'ChulaCharasNewBold';
+    src: url('/fonts/ChulaCharasNewBold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+็้header {
+    font-family: 'ChulalongkornBold', ChulalongkornReg, ChulaCharasNewBold, ChulaCharasNewReg,Sarabun, sans-serif;
+}
+body {
+    font-family: 'ChulalongkornBold', ChulalongkornReg, ChulaCharasNewBold, ChulaCharasNewReg,Sarabun, sans-serif;
+    background-color: #FDFBF5;
+    color: #333;
+}
+.bg-primary { background-color: #FDFBF5; }
+.bg-secondary { background-color: #F1F3F0; }
+.bg-accent { background-color: #A3B18A; }
+.text-accent { color: #DE5C8E; }
+.text-dark { color: #F05023; }
+.border-accent { border-color: #A3B18A; }
+.btn {
+    background-color: #F05023;
+    color: #FFFFFF;
+    transition: background-color 0.3s ease;
+}
+.btn:hover {
+    background-color: #b53e17;
+}
+.btn-secondary {
+    background-color: #DE5C8E;
+    color: #FFFFFF;
+}
+.btn-secondary:hover {
+    background-color: #b12456;
+}
+.chart-container {
+    position: relative;
+    width: 100%;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    height: 350px;
+    max-height: 450px;
+}
+@media (min-width: 768px) {
+    .chart-container {
+        height: 400px;
+    }
+}
+.step-item {
+    border-left-width: 4px;
+}
