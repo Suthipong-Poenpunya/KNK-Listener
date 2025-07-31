@@ -265,7 +265,7 @@
   function showDetails(complaint) {
     document.getElementById('modalProblemName').textContent = complaint.problemName;
     document.getElementById('modalOrder').textContent = complaint.order;
-    document.getElementById('modalSubmissionDate').textContent = complaint.submissionDate;
+    document.getElementById('modalSubmissionDate').textContent = formatDate(complaint.submissionDate);
     document.getElementById('modalStatus').textContent = complaint.status;
     document.getElementById('modalDetails').textContent = complaint.details;
     document.getElementById('modalSuggestions').textContent = complaint.suggestions;
