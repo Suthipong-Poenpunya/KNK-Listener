@@ -17,6 +17,9 @@
   <h1 class="text-5xl md:text-6xl font-bold text-dark mb-4">KNK-Listener</h1>
 </header>
 <style>
+  header {
+    font-family: CHULALONGKORN, 'Sarabun', sans-serif;
+  }
   .link-home{
     font-family: CHULALONGKORN, 'Sarabun', sans-serif;
     text-align: center;
@@ -278,7 +281,7 @@
     const noImageText = document.getElementById('noImageText');
 
     if (complaint.imageId) { // Check if 'imageId' column exists and has a value
-      const imageUrl = `https://drive.usercontent.google.com/download?id=${complaint.imageId}`;
+      const imageUrl = `https://drive.google.com/uc?export=view&id=${complaint.imageId}`;
       modalImageElement.src = imageUrl;
       modalImageElement.classList.remove('hidden'); // Show the image
       noImageText.classList.add('hidden'); // Hide the "no image" text
