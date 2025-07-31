@@ -283,7 +283,7 @@
     console.log('Complaint imageId:', complaint.imageId); // Log the imageId
 
     if (complaint.imageId) { // Check if 'imageId' column exists and has a value
-      const imageUrl = `https://drive.usercontent.google.com/download?id=${complaint.imageId}`;
+      const imageUrl = `https://drive.google.com/file/d/${complaint.imageId}`;
       console.log('Attempting to load image from URL:', imageUrl); // Log the generated URL
       modalImageElement.src = imageUrl;
       modalImageElement.classList.remove('hidden'); // Show the image
