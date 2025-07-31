@@ -169,6 +169,13 @@
   // Replace 'YOUR_WEB_APP_URL_HERE' with the actual URL you get from deploying your Google Apps Script
   const GOOGLE_SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwji2vOl6fGeCTIjmexBoU8BwRSYtm7Lj7YhBapXQgsGV0Ai_jxbqoB0I-IZN_KsypHyw/exec';
 
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.getMonth() + 1; // getMonth() is 0-indexed
+    const year = date.getFullYear(); // Convert to Buddhist calendar year
+    return `${day}/${month}/${year}`;
+  }
   const complaintTableBody = document.getElementById('complaintTableBody');
   const detailModal = document.getElementById('detailModal');
   const searchInput = document.getElementById('searchInput');
