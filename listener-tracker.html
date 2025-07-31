@@ -86,11 +86,13 @@
 </style>
 </head>
 
+<!-- Main Container -->
 <div class="bg-white p-6 sm:p-8 md:p-10 rounded-2xl shadow-xl w-full max-w-5xl mb-8">
   <h1 class="text-3xl sm:text-4xl font-extrabold text-center text-orange-600 mb-6 sm:mb-8">
     ระบบติดตามสถานะร้องเรียนของนิสิต
   </h1>
 
+  <!-- Search and Filter Section -->
   <div class="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
     <input type="text" id="searchInput" placeholder="ค้นหาชื่อปัญหา หรือสถานะ..."
            class="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-base">
@@ -104,6 +106,7 @@
     </select>
   </div>
 
+  <!-- Complaints Table -->
   <div class="overflow-x-auto rounded-xl border border-pink-200 shadow-sm">
     <table class="min-w-full divide-y divide-pink-200">
       <thead class="bg-pink-600 text-white">
@@ -123,15 +126,17 @@
       </tr>
       </thead>
       <tbody id="complaintTableBody" class="bg-white divide-y divide-gray-100">
+      <!-- Data will be populated here by JavaScript -->
       </tbody>
     </table>
   </div>
 </div>
 
+<!-- Detail Modal -->
 <div id="detailModal" class="modal">
   <div class="modal-content">
     <span class="close-button" onclick="closeModal()">&times;</span>
-    <h2 id="modalProblemName" class="text-2xl font-bold text-pink-700 mb-4"></h2>
+    <h2 id="modalProblemName" class="text-2xl font-bold text-indigo-700 mb-4"></h2>
     <div class="space-y-3 text-gray-700">
       <p><strong class="font-semibold">ลำดับ:</strong> <span id="modalOrder"></span></p>
       <p><strong class="font-semibold">วันที่ส่งฟอร์ม:</strong> <span id="modalSubmissionDate"></span></p>
@@ -140,158 +145,180 @@
       <p id="modalDetails" class="bg-gray-50 p-3 rounded-lg border border-gray-200"></p>
       <p><strong class="font-semibold">ข้อเสนอแนะ:</strong></p>
       <p id="modalSuggestions" class="bg-gray-50 p-3 rounded-lg border border-gray-200"></p>
-      <div id="modalImage_pathContainer" class="mt-4 hidden">
-        <strong class="font-semibold">รูปภาพ:</strong>
-        <img id="modalImage_path" src="" alt="รูปภาพประกอบ" class="mt-2 rounded-lg max-w-full h-auto border border-gray-300">
+
+      <!-- New section for image display -->
+      <p><strong class="font-semibold">รูปภาพที่เกี่ยวข้อง:</strong></p>
+      <div id="modalImageContainer" class="bg-gray-50 p-3 rounded-lg border border-gray-200 flex justify-center items-center h-48 overflow-hidden">
+        <img id="modalImage" src="" alt="รูปภาพปัญหา" class="max-w-full max-h-full object-contain hidden">
+        <span id="noImageText" class="text-gray-500">ไม่มีรูปภาพที่เกี่ยวข้อง</span>
       </div>
+      <!-- End of new section -->
+
     </div>
   </div>
 </div>
 
-  <script>
-    let complaintsData = []; // Store the fetched data globally
+<script>
+  // Replace 'YOUR_WEB_APP_URL_HERE' with the actual URL you get from deploying your Google Apps Script
+  const GOOGLE_SHEET_API_URL = 'YOUR_WEB_APP_URL_HERE';
 
-    // Function to format date to a more readable format (e.g., 30/7/2568)
-    function formatDate(dateString) {
-      const date = new Date(dateString);
-      const day = date.getDate();
-      const month = date.getMonth() + 1; // getMonth() is 0-indexed
-      const year = date.getFullYear(); // Convert to Buddhist calendar year
-      return `${day}/${month}/${year}`;
-    }
+  const complaintTableBody = document.getElementById('complaintTableBody');
+  const detailModal = document.getElementById('detailModal');
+  const searchInput = document.getElementById('searchInput');
+  const statusFilter = document.getElementById('statusFilter');
 
-    // Function to fetch data and render the table
-    fetch('https://script.google.com/macros/s/AKfycbwji2vOl6fGeCTIjmexBoU8BwRSYtm7Lj7YhBapXQgsGV0Ai_jxbqoB0I-IZN_KsypHyw/exec')
-            .then(response => response.json())
-            .then(data => {
-              complaintsData = data; // Assign fetched data to the global variable
-              renderTable(complaintsData);
-            })
-            .catch(error => console.error('Error fetching data:', error));
+  let complaintsData = []; // This will store the data fetched from Google Sheet
 
-    const complaintTableBody = document.getElementById('complaintTableBody');
-    const detailModal = document.getElementById('detailModal');
-    const searchInput = document.getElementById('searchInput');
-    const statusFilter = document.getElementById('statusFilter');
-
-    // Function to render the table rows
-    function renderTable(data) {
-      complaintTableBody.innerHTML = ''; // Clear existing rows
-      if (data.length === 0) {
-        complaintTableBody.innerHTML = `
-                      <tr>
-                          <td colspan="4" class="px-4 py-4 text-center text-gray-500 text-base">
-                              ไม่พบข้อมูลการร้องเรียน
-                          </td>
-                      </tr>
-                  `;
-        return;
+  // Function to fetch data from Google Apps Script Web App
+  async function fetchComplaintsData() {
+    try {
+      const response = await fetch(GOOGLE_SHEET_API_URL);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      const data = await response.json();
+      complaintsData = data; // Store the fetched data
+      renderTable(complaintsData); // Render the table with fetched data
+    } catch (error) {
+      console.error('Error fetching data from Google Sheet API:', error);
+      // Display an error message to the user if data fetching fails
+      complaintTableBody.innerHTML = `
+          <tr>
+            <td colspan="4" class="px-4 py-4 text-center text-red-500 text-base">
+              ไม่สามารถดึงข้อมูลได้ โปรดตรวจสอบการเชื่อมต่อหรือ URL ของ Google Apps Script
+            </td>
+          </tr>
+        `;
+    }
+  }
 
-      data.forEach(complaint => {
-        const row = document.createElement('tr');
-        row.classList.add('hover:bg-gray-50', 'cursor-pointer', 'transition-colors', 'duration-200');
-        row.innerHTML = `
-                      <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm font-medium text-gray-900">${complaint.order}</td>
-                      <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm text-gray-800">${complaint.problemName}</td>
-                      <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm text-gray-600">${formatDate(complaint.submissionDate)}</td>
-                      <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm">
-                          <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
-                              ${complaint.status === 'แก้ไขแล้ว' ? 'bg-green-100 text-green-800' : ''}
-                              ${complaint.status === 'กำลังดำเนินการ' ? 'bg-blue-100 text-blue-800' : ''}
-                              ${complaint.status === 'รอการตรวจสอบ' ? 'bg-yellow-100 text-yellow-800' : ''}
-                              ${complaint.status === 'ปิดเรื่อง' ? 'bg-gray-100 text-gray-800' : ''}
-                          ">
-                              ${complaint.status}
-                          </span>
-                      </td>
-                  `;
-        row.addEventListener('click', () => showDetails(complaint));
-        complaintTableBody.appendChild(row);
-      });
+  // Function to render the table rows
+  function renderTable(data) {
+    complaintTableBody.innerHTML = ''; // Clear existing rows
+    if (data.length === 0) {
+      complaintTableBody.innerHTML = `
+          <tr>
+            <td colspan="4" class="px-4 py-4 text-center text-gray-500 text-base">
+              ไม่พบข้อมูลการร้องเรียน
+            </td>
+          </tr>
+        `;
+      return;
     }
 
-    // Function to filter and search data
-    function filterAndSearch() {
-      const searchTerm = searchInput.value.toLowerCase();
-      const selectedStatus = statusFilter.value;
-
-      const filteredData = complaintsData.filter(complaint => {
-        const matchesSearch = complaint.problemName.toLowerCase().includes(searchTerm) ||
-                complaint.status.toLowerCase().includes(searchTerm);
-        const matchesStatus = selectedStatus === "" || complaint.status === selectedStatus;
-        return matchesSearch && matchesStatus;
-      });
-      renderTable(filteredData);
-    }
-
-    // Event listeners for search and filter
-    searchInput.addEventListener('keyup', filterAndSearch);
-    statusFilter.addEventListener('change', filterAndSearch);
-
-    // Function to show complaint details in the modal
-    function showDetails(complaint) {
-      document.getElementById('modalProblemName').textContent = complaint.problemName;
-      document.getElementById('modalOrder').textContent = complaint.order;
-      document.getElementById('modalSubmissionDate').textContent = formatDate(complaint.submissionDate); // แก้ไข: ใช้ formatDate เพื่อจัดรูปแบบวันที่
-      document.getElementById('modalStatus').textContent = complaint.status;
-      document.getElementById('modalDetails').textContent = complaint.details;
-      document.getElementById('modalSuggestions').textContent = complaint.suggestions;
-
-      // แก้ไขตรงนี้: ใช้ตัวแปรที่ถูกต้องตรงกับ ID ใน HTML
-      const modalImageContainer = document.getElementById('modalImage_pathContainer');
-      const modalImage = document.getElementById('modalImage_path');
-
-      if (complaint.image) {
-        modalImage.src = complaint.image;
-        modalImageContainer.classList.remove('hidden');
-      } else {
-        modalImageContainer.classList.add('hidden');
-      }
-
-      // Apply status-specific styling to the modal status text
-      const modalStatusElement = document.getElementById('modalStatus');
-      modalStatusElement.className = 'font-bold'; // Reset classes
-      if (complaint.status === 'แก้ไขแล้ว') {
-        modalStatusElement.classList.add('text-green-700');
-      } else if (complaint.status === 'กำลังดำเนินการ') {
-        modalStatusElement.classList.add('text-blue-700');
-      } else if (complaint.status === 'รอการตรวจสอบ') {
-        modalStatusElement.classList.add('text-yellow-700');
-      } else if (complaint.status === 'ปิดเรื่อง') {
-        modalStatusElement.classList.add('text-gray-700');
-      }
-
-      detailModal.style.display = 'flex'; // Show the modal
-      setTimeout(() => { // Add a slight delay for the transform animation
-        detailModal.querySelector('.modal-content').classList.add('show');
-      }, 10);
-    }
-
-    // Function to close the modal
-    function closeModal() {
-      detailModal.querySelector('.modal-content').classList.remove('show');
-      setTimeout(() => { // Hide after animation
-        detailModal.style.display = 'none';
-      }, 300); // Match CSS transition duration
-    }
-
-    // Close modal when clicking outside of it
-    window.addEventListener('click', (event) => {
-      if (event.target === detailModal) {
-        closeModal();
-      }
+    data.forEach(complaint => {
+      const row = document.createElement('tr');
+      row.classList.add('hover:bg-gray-50', 'cursor-pointer', 'transition-colors', 'duration-200');
+      row.innerHTML = `
+          <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm font-medium text-gray-900">${complaint.order}</td>
+          <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm text-gray-800">${complaint.problemName}</td>
+          <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm text-gray-600">${complaint.submissionDate}</td>
+          <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm">
+            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
+              ${complaint.status === 'แก้ไขแล้ว' ? 'bg-green-100 text-green-800' : ''}
+              ${complaint.status === 'กำลังดำเนินการ' ? 'bg-blue-100 text-blue-800' : ''}
+              ${complaint.status === 'รอการตรวจสอบ' ? 'bg-yellow-100 text-yellow-800' : ''}
+              ${complaint.status === 'ปิดเรื่อง' ? 'bg-gray-100 text-gray-800' : ''}
+            ">
+              ${complaint.status}
+            </span>
+          </td>
+        `;
+      row.addEventListener('click', () => showDetails(complaint));
+      complaintTableBody.appendChild(row);
     });
+  }
 
-    // Initial render of the table when the page loads
-    document.addEventListener('DOMContentLoaded', () => {
-      // Data is now fetched in the `fetch` block, so this initial render is not needed.
-      // The `fetch` block handles it.
+  // Function to filter and search data
+  function filterAndSearch() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const selectedStatus = statusFilter.value;
+
+    const filteredData = complaintsData.filter(complaint => {
+      const matchesSearch = complaint.problemName.toLowerCase().includes(searchTerm) ||
+              complaint.status.toLowerCase().includes(searchTerm);
+      const matchesStatus = selectedStatus === "" || complaint.status === selectedStatus;
+      return matchesSearch && matchesStatus;
     });
-  </script>
+    renderTable(filteredData);
+  }
+
+  // Event listeners for search and filter
+  searchInput.addEventListener('keyup', filterAndSearch);
+  statusFilter.addEventListener('change', filterAndSearch);
+
+  // Function to show complaint details in the modal
+  function showDetails(complaint) {
+    document.getElementById('modalProblemName').textContent = complaint.problemName;
+    document.getElementById('modalOrder').textContent = complaint.order;
+    document.getElementById('modalSubmissionDate').textContent = complaint.submissionDate;
+    document.getElementById('modalStatus').textContent = complaint.status;
+    document.getElementById('modalDetails').textContent = complaint.details;
+    document.getElementById('modalSuggestions').textContent = complaint.suggestions;
+
+    // Apply status-specific styling to the modal status text
+    const modalStatusElement = document.getElementById('modalStatus');
+    modalStatusElement.className = 'font-bold'; // Reset classes
+    if (complaint.status === 'แก้ไขแล้ว') {
+      modalStatusElement.classList.add('text-green-700');
+    } else if (complaint.status === 'กำลังดำเนินการ') {
+      modalStatusElement.classList.add('text-blue-700');
+    } else if (complaint.status === 'รอการตรวจสอบ') {
+      modalStatusElement.classList.add('text-yellow-700');
+    } else if (complaint.status === 'ปิดเรื่อง') {
+      modalStatusElement.classList.add('text-gray-700');
+    }
+
+    // --- New image display logic ---
+    const modalImageElement = document.getElementById('modalImage');
+    const noImageText = document.getElementById('noImageText');
+
+    if (complaint.imageId) { // Check if 'imageId' column exists and has a value
+      const imageUrl = `https://drive.google.com/uc?export=view&id=${complaint.imageId}`;
+      modalImageElement.src = imageUrl;
+      modalImageElement.classList.remove('hidden'); // Show the image
+      noImageText.classList.add('hidden'); // Hide the "no image" text
+
+      // Add an error handler for the image in case it fails to load
+      modalImageElement.onerror = () => {
+        modalImageElement.classList.add('hidden');
+        noImageText.classList.remove('hidden');
+        noImageText.textContent = 'ไม่สามารถโหลดรูปภาพได้'; // Display error message
+      };
+    } else {
+      modalImageElement.classList.add('hidden'); // Hide the image
+      noImageText.classList.remove('hidden'); // Show the "no image" text
+      noImageText.textContent = 'ไม่มีรูปภาพที่เกี่ยวข้อง'; // Default text
+    }
+    // --- End new image display logic ---
+
+    detailModal.style.display = 'flex'; // Show the modal
+    setTimeout(() => { // Add a slight delay for the transform animation
+      detailModal.querySelector('.modal-content').classList.add('show');
+    }, 10);
+  }
+
+  // Function to close the modal
+  function closeModal() {
+    detailModal.querySelector('.modal-content').classList.remove('show');
+    setTimeout(() => { // Hide after animation
+      detailModal.style.display = 'none';
+    }, 300); // Match CSS transition duration
+  }
+
+  // Close modal when clicking outside of it
+  window.addEventListener('click', (event) => {
+    if (event.target === detailModal) {
+      closeModal();
+    }
+  });
+
+  // Initial render of the table when the page loads
+  document.addEventListener('DOMContentLoaded', () => {
+    fetchComplaintsData(); // Fetch data when the page loads
+  });
+</script>
 </body>
 <footer>
   <a href="index.html" class="link-home">กลับหน้าหลัก</a>
   <p>&copy; 2025 KNK-Listener. คณะกรรมการนิสิตปรัญญาบัณฑิตคณะครุศาสตร์ จุฬาลงกรณ์มหาวิทยาลัย สงวนลิขสิทธิ์</p>
-</footer>
-</html>
