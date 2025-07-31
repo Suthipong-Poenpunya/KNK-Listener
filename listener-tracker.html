@@ -163,7 +163,7 @@
   const GOOGLE_SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwIhPPC9_SwqQikaGDLJ0KZGPT_oTXxMkcgbJAo7qa3WNjeRqznJwyM-ckeFExNJWTzUQ/exec';
 
   // Replace 'YOUR_IMAGE_PROXY_API_URL_HERE' with the actual URL for your image proxy API
-  const GOOGLE_IMAGE_PROXY_API_URL = 'https://script.google.com/macros/s/AKfycbyNHh7nHW8hld56GnmnaUXdOIDvq-UWDfD8an-vAjp2l_fsypkxHmwuT5uLoh_bo4iyfg/exec';
+  const GOOGLE_IMAGE_PROXY_API_URL = 'https://drive.google.com/file/u/';
 
   // Function to format date to a more readable format (e.g., 30/7/2568)
   function formatDate(dateString) {
@@ -289,7 +289,7 @@
 
     if (complaint.imageId) { // Check if 'imageId' column exists and has a value
       // Construct the URL to your Apps Script Image Proxy
-      const imageUrl = `${GOOGLE_IMAGE_PROXY_API_URL}?id=${complaint.imageId}`;
+      const imageUrl = `https://drive.google.com/uc?export=view&id=${complaint.imageId}`;
       console.log('Attempting to load image from Image Proxy URL:', imageUrl); // Log the generated URL
 
       modalImageElement.src = imageUrl;
