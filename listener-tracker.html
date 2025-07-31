@@ -287,9 +287,13 @@
 
     console.log('Complaint imageId:', complaint.imageId); // Log the imageId
 
+    var width;
     if (complaint.imageId) { // Check if 'imageId' column exists and has a value
       // Construct the URL to your Apps Script Image Proxy
-      const imageUrl = `https://drive.google.com/uc?export=view&id=${complaint.imageId}`;
+      const imageUrl = `https://drive.google.com/uc?export=view&id=${complaint.imageId}`
+      width = "640"
+      height = "480"
+      allow = "autoplay";
       console.log('Attempting to load image from Image Proxy URL:', imageUrl); // Log the generated URL
 
       modalImageElement.src = imageUrl;
