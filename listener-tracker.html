@@ -276,6 +276,7 @@
       modalStatusElement.classList.add('text-gray-700');
     }
 
+    // --- New image display logic ---
     const modalImageElement = document.getElementById('modalImage');
     const noImageText = document.getElementById('noImageText');
 
@@ -288,15 +289,19 @@
       modalImageElement.classList.remove('hidden'); // Show the image
       noImageText.classList.add('hidden'); // Hide the "no image" text
 
-      // Temporarily comment out onerror to see if it's interfering
-      /*
+      // Re-enable onerror and add onload for better debugging
+      modalImageElement.onload = () => {
+        console.log('Image loaded successfully for ID:', complaint.imageId);
+        modalImageElement.classList.remove('hidden'); // Ensure it's visible
+        noImageText.classList.add('hidden'); // Ensure "no image" text is hidden
+      };
+
       modalImageElement.onerror = () => {
         console.error('Image failed to load for ID:', complaint.imageId, 'URL:', imageUrl);
         modalImageElement.classList.add('hidden');
         noImageText.classList.remove('hidden');
         noImageText.textContent = 'ไม่สามารถโหลดรูปภาพได้'; // Display error message
       };
-      */
     } else {
       console.log('No imageId found for this complaint.');
       modalImageElement.classList.add('hidden'); // Hide the image
