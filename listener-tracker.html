@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="/img/Logo_EDU-01.png" type="image/x-icon">
+  <link rel="icon" href="img/Logo_EDU-01.png" type="image/x-icon">
 </head>
 <body class="p-4 sm:p-6 md:p-8 lg:p-10 min-h-screen flex flex-col items-center">
 <header class="text-center mb-12">
@@ -276,23 +276,29 @@
       modalStatusElement.classList.add('text-gray-700');
     }
 
-    // --- New image display logic ---
     const modalImageElement = document.getElementById('modalImage');
     const noImageText = document.getElementById('noImageText');
 
+    console.log('Complaint imageId:', complaint.imageId); // Log the imageId
+
     if (complaint.imageId) { // Check if 'imageId' column exists and has a value
       const imageUrl = `https://drive.google.com/uc?export=view&id=${complaint.imageId}`;
+      console.log('Attempting to load image from URL:', imageUrl); // Log the generated URL
       modalImageElement.src = imageUrl;
       modalImageElement.classList.remove('hidden'); // Show the image
       noImageText.classList.add('hidden'); // Hide the "no image" text
 
-      // Add an error handler for the image in case it fails to load
+      // Temporarily comment out onerror to see if it's interfering
+      /*
       modalImageElement.onerror = () => {
+        console.error('Image failed to load for ID:', complaint.imageId, 'URL:', imageUrl);
         modalImageElement.classList.add('hidden');
         noImageText.classList.remove('hidden');
         noImageText.textContent = 'ไม่สามารถโหลดรูปภาพได้'; // Display error message
       };
+      */
     } else {
+      console.log('No imageId found for this complaint.');
       modalImageElement.classList.add('hidden'); // Hide the image
       noImageText.classList.remove('hidden'); // Show the "no image" text
       noImageText.textContent = 'ไม่มีรูปภาพที่เกี่ยวข้อง'; // Default text
