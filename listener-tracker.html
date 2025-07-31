@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="img/Logo_EDU-01.png" type="image/x-icon">
+  <link rel="icon" href="/img/Logo_EDU-01.png" type="image/x-icon">
 </head>
 <body class="p-4 sm:p-6 md:p-8 lg:p-10 min-h-screen flex flex-col items-center">
 <header class="text-center mb-12">
@@ -17,11 +17,7 @@
   <h1 class="text-5xl md:text-6xl font-bold text-dark mb-4">KNK-Listener</h1>
 </header>
 <style>
-  header {
-    font-family: CHULALONGKORN, 'Sarabun', sans-serif;
-  }
   .link-home{
-    font-family: CHULALONGKORN, 'Sarabun', sans-serif;
     text-align: center;
     text-decoration: none;
     color: #000;
@@ -30,7 +26,6 @@
     text-decoration-color: #555555;
   }
   .modal {
-    font-family: CHULALONGKORN, 'Sarabun', sans-serif;
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
     z-index: 1000; /* Sit on top */
@@ -44,7 +39,6 @@
     align-items: center;
   }
   .modal-content {
-    font-family: CHULALONGKORN, 'Sarabun', sans-serif;
     background-color: #ffffff;
     margin: auto;
     padding: 2.5rem; /* Increased padding */
@@ -57,7 +51,6 @@
     transition: transform 0.3s ease-out;
   }
   .modal-content.show {
-    font-family: CHULALONGKORN, 'Sarabun', sans-serif;
     transform: translateY(0);
   }
   .close-button {
@@ -166,14 +159,18 @@
 </div>
 
 <script>
-  // Replace 'YOUR_WEB_APP_URL_HERE' with the actual URL you get from deploying your Google Apps Script
-  const GOOGLE_SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwji2vOl6fGeCTIjmexBoU8BwRSYtm7Lj7YhBapXQgsGV0Ai_jxbqoB0I-IZN_KsypHyw/exec';
+  // Replace 'YOUR_GOOGLE_SHEET_API_URL_HERE' with the actual URL for your sheet data API
+  const GOOGLE_SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbziwkC0xbzJDbZmUx4caHdFIp-P647YLnGlMF_YNuZn1sbwvl_AFesZOvzHRt6flteSwg/exec';
 
+  // Replace 'YOUR_IMAGE_PROXY_API_URL_HERE' with the actual URL for your image proxy API
+  const GOOGLE_IMAGE_PROXY_API_URL = 'https://script.google.com/macros/s/AKfycbw6T_htHs26JAwP-bU8RZ7vun1Mfah_MLNvXGzFUGv14A1vQU_t9fbEE_n7fZAtMX6ojw/exec';
+
+  // Function to format date to a more readable format (e.g., 30/7/2568)
   function formatDate(dateString) {
     const date = new Date(dateString);
     const day = date.getDate();
     const month = date.getMonth() + 1; // getMonth() is 0-indexed
-    const year = date.getFullYear(); // Convert to Buddhist calendar year
+    const year = date.getFullYear() + 543; // Convert to Buddhist calendar year
     return `${day}/${month}/${year}`;
   }
   const complaintTableBody = document.getElementById('complaintTableBody');
@@ -263,6 +260,7 @@
 
   // Function to show complaint details in the modal
   function showDetails(complaint) {
+    console.log('showDetails called for complaint:', complaint); // Log the complaint object
     document.getElementById('modalProblemName').textContent = complaint.problemName;
     document.getElementById('modalOrder').textContent = complaint.order;
     document.getElementById('modalSubmissionDate').textContent = formatDate(complaint.submissionDate);
@@ -283,31 +281,32 @@
       modalStatusElement.classList.add('text-gray-700');
     }
 
-    // --- New image display logic ---
+    // --- New image display logic using Image Proxy ---
     const modalImageElement = document.getElementById('modalImage');
     const noImageText = document.getElementById('noImageText');
 
     console.log('Complaint imageId:', complaint.imageId); // Log the imageId
 
     if (complaint.imageId) { // Check if 'imageId' column exists and has a value
-      const imageUrl = `https://drive.google.com/uc?export=view&id=${complaint.imageId}`;
-      console.log('Attempting to load image from URL:', imageUrl); // Log the generated URL
+      // Construct the URL to your Apps Script Image Proxy
+      const imageUrl = `${GOOGLE_IMAGE_PROXY_API_URL}?id=${complaint.imageId}`;
+      console.log('Attempting to load image from Image Proxy URL:', imageUrl); // Log the generated URL
+
       modalImageElement.src = imageUrl;
       modalImageElement.classList.remove('hidden'); // Show the image
       noImageText.classList.add('hidden'); // Hide the "no image" text
 
-      // Re-enable onerror and add onload for better debugging
       modalImageElement.onload = () => {
-        console.log('Image loaded successfully for ID:', complaint.imageId);
+        console.log('Image loaded successfully via proxy for ID:', complaint.imageId);
         modalImageElement.classList.remove('hidden'); // Ensure it's visible
         noImageText.classList.add('hidden'); // Ensure "no image" text is hidden
       };
 
       modalImageElement.onerror = () => {
-        console.error('Image failed to load for ID:', complaint.imageId, 'URL:', imageUrl);
+        console.error('Image failed to load via proxy for ID:', complaint.imageId, 'URL:', imageUrl);
         modalImageElement.classList.add('hidden');
         noImageText.classList.remove('hidden');
-        noImageText.textContent = 'ไม่สามารถโหลดรูปภาพได้'; // Display error message
+        noImageText.textContent = 'ไม่สามารถโหลดรูปภาพได้จาก Proxy'; // Display error message
       };
     } else {
       console.log('No imageId found for this complaint.');
