@@ -170,7 +170,7 @@
     const date = new Date(dateString);
     const day = date.getDate();
     const month = date.getMonth() + 1; // getMonth() is 0-indexed
-    const year = date.getFullYear() + 543; // Convert to Buddhist calendar year
+    const year = date.getFullYear(); // Convert to Buddhist calendar year
     return `${day}/${month}/${year}`;
   }
   const complaintTableBody = document.getElementById('complaintTableBody');
@@ -216,14 +216,14 @@
         `;
       return;
     }
-
     data.forEach(complaint => {
       const row = document.createElement('tr');
       row.classList.add('hover:bg-gray-50', 'cursor-pointer', 'transition-colors', 'duration-200');
+      previewdate = formatDate(complaint.submissionDate);
       row.innerHTML = `
           <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm font-medium text-gray-900">${complaint.order}</td>
           <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm text-gray-800">${complaint.problemName}</td>
-          <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm text-gray-600">${complaint.submissionDate}</td>
+          <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm text-gray-600">${previewdate}</td>
           <td class="px-4 py-3 sm:px-6 whitespace-nowrap text-sm">
             <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
               ${complaint.status === 'แก้ไขแล้ว' ? 'bg-green-100 text-green-800' : ''}
