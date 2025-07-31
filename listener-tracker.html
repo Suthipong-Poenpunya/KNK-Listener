@@ -163,7 +163,7 @@
   const GOOGLE_SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwIhPPC9_SwqQikaGDLJ0KZGPT_oTXxMkcgbJAo7qa3WNjeRqznJwyM-ckeFExNJWTzUQ/exec';
 
   // Replace 'YOUR_IMAGE_PROXY_API_URL_HERE' with the actual URL for your image proxy API
-  const GOOGLE_IMAGE_PROXY_API_URL = 'https://script.google.com/macros/s/AKfycbw6T_htHs26JAwP-bU8RZ7vun1Mfah_MLNvXGzFUGv14A1vQU_t9fbEE_n7fZAtMX6ojw/exec';
+  const GOOGLE_IMAGE_PROXY_API_URL = 'https://script.google.com/macros/s/AKfycbyNHh7nHW8hld56GnmnaUXdOIDvq-UWDfD8an-vAjp2l_fsypkxHmwuT5uLoh_bo4iyfg/exec';
 
   // Function to format date to a more readable format (e.g., 30/7/2568)
   function formatDate(dateString) {
@@ -273,7 +273,7 @@
     modalStatusElement.className = 'font-bold'; // Reset classes
     if (complaint.status === 'แก้ไขแล้ว') {
       modalStatusElement.classList.add('text-green-700');
-    } else if (complaint.status === 'กำลังดำเนินการ') {
+    } else if (complaint.status === 'กำลังดำเนินการแก้ไข') {
       modalStatusElement.classList.add('text-blue-700');
     } else if (complaint.status === 'รอการตรวจสอบ') {
       modalStatusElement.classList.add('text-yellow-700');
