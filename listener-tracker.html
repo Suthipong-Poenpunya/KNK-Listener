@@ -278,7 +278,7 @@
     const noImageText = document.getElementById('noImageText');
 
     if (complaint.imageId) { // Check if 'imageId' column exists and has a value
-      const imageUrl = `https://drive.google.com/uc?export=view&id=${complaint.imageId}`;
+      const imageUrl = `https://drive.usercontent.google.com/download?id=${complaint.imageId}`;
       modalImageElement.src = imageUrl;
       modalImageElement.classList.remove('hidden'); // Show the image
       noImageText.classList.add('hidden'); // Hide the "no image" text
