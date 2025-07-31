@@ -146,13 +146,15 @@
       <p><strong class="font-semibold">ข้อเสนอแนะ:</strong></p>
       <p id="modalSuggestions" class="bg-gray-50 p-3 rounded-lg border border-gray-200"></p>
 
-      <!-- New section for image display -->
+      <!-- Section for image link -->
       <p><strong class="font-semibold">รูปภาพที่เกี่ยวข้อง:</strong></p>
-      <div id="modalImageContainer" class="bg-gray-50 p-3 rounded-lg border border-gray-200 flex justify-center items-center h-48 overflow-hidden">
-        <img id="modalImage" src="" alt="รูปภาพปัญหา" class="max-w-full max-h-full object-contain hidden">
+      <div id="modalImageLinkContainer" class="bg-gray-50 p-3 rounded-lg border border-gray-200 flex justify-center items-center h-24">
+        <a id="modalImageLink" href="#" target="_blank" class="hidden px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition-colors">
+          คลิกเพื่อดูรูปภาพ
+        </a>
         <span id="noImageText" class="text-gray-500">ไม่มีรูปภาพที่เกี่ยวข้อง</span>
       </div>
-      <!-- End of new section -->
+      <!-- End of image link section -->
 
     </div>
   </div>
@@ -160,10 +162,10 @@
 
 <script>
   // Replace 'YOUR_GOOGLE_SHEET_API_URL_HERE' with the actual URL for your sheet data API
-  const GOOGLE_SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbxwYnxVAIeFZ9YHsLqfdY6u4gObMXetNkgplaYimJYvbJ2pXwnM2XlhgkipqA2T7mqTzQ/exec';
+  const GOOGLE_SHEET_API_URL = 'https://script.google.com/macros/s/AKfycbwIhPPC9_SwqQikaGDLJ0KZGPT_oTXxMkcgbJAo7qa3WNjeRqznJwyM-ckeFExNJWTzUQ/exec';
 
-  // Replace 'YOUR_IMAGE_PROXY_API_URL_HERE' with the actual URL for your image proxy API
-  const GOOGLE_IMAGE_PROXY_API_URL = 'https://script.google.com/macros/s/AKfycbxwYnxVAIeFZ9YHsLqfdY6u4gObMXetNkgplaYimJYvbJ2pXwnM2XlhgkipqA2T7mqTzQ/exec';
+  // The image proxy API is no longer needed for this approach.
+  // const GOOGLE_IMAGE_PROXY_API_URL = 'YOUR_IMAGE_PROXY_API_URL_HERE';
 
   // Function to format date to a more readable format (e.g., 30/7/2568)
   function formatDate(dateString) {
@@ -281,40 +283,27 @@
       modalStatusElement.classList.add('text-gray-700');
     }
 
-    // --- New image display logic using Image Proxy ---
-    const modalImageElement = document.getElementById('modalImage');
+    // --- New image link logic ---
+    const modalImageLink = document.getElementById('modalImageLink');
     const noImageText = document.getElementById('noImageText');
 
     console.log('Complaint imageId:', complaint.imageId); // Log the imageId
 
     if (complaint.imageId) { // Check if 'imageId' column exists and has a value
-      // Construct the URL to your Apps Script Image Proxy
-      const imageUrl = `${GOOGLE_IMAGE_PROXY_API_URL}?id=${complaint.imageId}`;
-      console.log('Attempting to load image from Image Proxy URL:', imageUrl); // Log the generated URL
+      // Construct the direct Google Drive image URL
+      const directImageUrl = `https://drive.google.com/uc?export=view&id=${complaint.imageId}`;
+      console.log('Direct image URL:', directImageUrl); // Log the generated URL
 
-      modalImageElement.src = imageUrl;
-      modalImageElement.classList.remove('hidden'); // Show the image
+      modalImageLink.href = directImageUrl; // Set the link URL
+      modalImageLink.classList.remove('hidden'); // Show the button
       noImageText.classList.add('hidden'); // Hide the "no image" text
-
-      modalImageElement.onload = () => {
-        console.log('Image loaded successfully via proxy for ID:', complaint.imageId);
-        modalImageElement.classList.remove('hidden'); // Ensure it's visible
-        noImageText.classList.add('hidden'); // Ensure "no image" text is hidden
-      };
-
-      modalImageElement.onerror = () => {
-        console.error('Image failed to load via proxy for ID:', complaint.imageId, 'URL:', imageUrl);
-        modalImageElement.classList.add('hidden');
-        noImageText.classList.remove('hidden');
-        noImageText.textContent = 'ไม่สามารถโหลดรูปภาพได้จาก Proxy'; // Display error message
-      };
     } else {
       console.log('No imageId found for this complaint.');
-      modalImageElement.classList.add('hidden'); // Hide the image
+      modalImageLink.classList.add('hidden'); // Hide the button
       noImageText.classList.remove('hidden'); // Show the "no image" text
       noImageText.textContent = 'ไม่มีรูปภาพที่เกี่ยวข้อง'; // Default text
     }
-    // --- End new image display logic ---
+    // --- End new image link logic ---
 
     detailModal.style.display = 'flex'; // Show the modal
     setTimeout(() => { // Add a slight delay for the transform animation
